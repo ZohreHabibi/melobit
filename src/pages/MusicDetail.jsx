@@ -1,9 +1,15 @@
 import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
 import { useParams } from "react-router-dom";
-import { useGetMusicDetailsQuery } from "../redux/services/shazamCoreApi";
-import Loading from "../components/Loading";
+import { useGetMusicDetailsQuery } from "../redux/services/melobitApi";
+import { useDispatch, useSelector } from "react-redux";
+import { playPause, setActiveSong } from "../redux/features/player";
+import Loader from "../components/Loader";
+import Error from "../components/Error";
 const MusicDetail = () => {
   const { MusicId } = useParams();
+  const { isPlaying } = useSelector((state) => state.player);
+  const dispatch = useDispatch();
+
   const { data, isLoading, error } = useGetMusicDetailsQuery({
     musicId: MusicId,
   });
@@ -16,10 +22,10 @@ const MusicDetail = () => {
     return month + "/" + day + "/" + year;
   };
   if (isLoading) {
-    return <Loading />;
+    return <Loader title="Music" />;
   }
   if (error) {
-    return <p>error</p>;
+    return <Error />;
   }
   return (
     <div className="flex flex-col text-white   my-7">
@@ -46,14 +52,31 @@ const MusicDetail = () => {
                     {getFormattedDate(new Date(`${data?.releaseDate}`))}
                   </span>
                   <span className="mr-3">{data?.downloadCount} plays</span>
-                  <span>05:29</span>
+                  <span>{`${Math.trunc(+data?.duration / 60)}:${
+                    data?.duration % 60 < 10
+                      ? (data?.duration % 60).toString().padStart(2, "0")
+                      : data?.duration % 60
+                  }`}</span>
                 </div>
                 <div className="flex justify-center items-center mt-12">
-                  <BsFillPauseFill
-                    className="rounded-full border-whiter border-4 hover:border-gray-300 cursor-pointer"
-                    color="white"
-                    size={65}
-                  />
+                  {isPlaying ? (
+                    <BsFillPauseFill
+                      className="rounded-full border-whiter border-4 hover:border-gray-300 cursor-pointer"
+                      color="white"
+                      size={65}
+                      onClick={() => dispatch(playPause(false))}
+                    />
+                  ) : (
+                    <BsFillPlayFill
+                      className="rounded-full border-whiter border-4 hover:border-gray-300 cursor-pointer"
+                      color="white"
+                      size={65}
+                      onClick={() => {
+                        dispatch(setActiveSong({ music: data }));
+                        dispatch(playPause(true));
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
