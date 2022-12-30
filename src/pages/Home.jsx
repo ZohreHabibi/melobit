@@ -5,7 +5,7 @@ import TrendingArtists from "../components/TrendingArtists";
 
 const Home = () => {
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center ">
       <NewestMusics />
       <TrendingArtists />
       <TopDayMusics />
