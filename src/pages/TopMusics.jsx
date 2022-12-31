@@ -1,11 +1,12 @@
-import { useEffect } from "react";
 import TopWeekDayMusicCard from "../components/TopWeekDayMusicCard";
 import {
   useGetTopDayMusicsQuery,
   useGetTopWeekMusicsQuery,
-} from "../redux/services/shazamCoreApi";
+} from "../redux/services/melobitApi";
 import { useMemo } from "react";
 import { useCallback } from "react";
+import Loader from "../components/Loader";
+import Error from "../components/Error";
 
 const TopMusics = () => {
   const {
@@ -18,6 +19,13 @@ const TopMusics = () => {
     isLoading: topWeekIsLoading,
     topWeekError,
   } = useGetTopWeekMusicsQuery();
+
+  if (topDayIsLoading || topWeekIsLoading) {
+    return <Loader title="Top List" />;
+  }
+  if (topDayError || topWeekError) {
+    return <Error />;
+  }
 
   const sortResultsFunc = useCallback((data) => {
     const milionDownloadns = [];
@@ -48,12 +56,16 @@ const TopMusics = () => {
 
   return (
     <div>
-      <h3 className="text-white text-xl">Top Week</h3>
       <div>
         <h2 className="text-white text-3xl ml-10  my-10">Top 10 of the Day</h2>
         <div className="mx-8">
           {sortedDayResults.map((music, i) => (
-            <TopWeekDayMusicCard key={music.id} music={music} i={i} />
+            <TopWeekDayMusicCard
+              currentListData={sortedDayResults}
+              key={music.id}
+              music={music}
+              i={i}
+            />
           ))}
         </div>
         <div className="mx-8">
@@ -61,7 +73,12 @@ const TopMusics = () => {
             Top 10 of the Week
           </h2>
           {sortedWeekResults.map((music, i) => (
-            <TopWeekDayMusicCard key={music.id} music={music} i={i} />
+            <TopWeekDayMusicCard
+              currentListData={sortedWeekResults}
+              key={music.id}
+              music={music}
+              i={i}
+            />
           ))}
         </div>
       </div>
