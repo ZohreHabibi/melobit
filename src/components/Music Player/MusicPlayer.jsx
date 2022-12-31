@@ -1,51 +1,120 @@
-import { MdSkipNext, MdSkipPrevious } from "react-icons/md";
-import coverIcon from "../../assets/images/cover.jpg";
-import audioSrc from "../../assets/01 Hollywood's Bleeding.mp3";
 import { prevSong, nextSong, playPause } from "../../redux/features/player";
-import {
-  BsFillVolumeUpFill,
-  BsVolumeDownFill,
-  BsFillVolumeMuteFill,
-} from "react-icons/bs";
-import {
-  BsArrowRepeat,
-  BsFillPauseFill,
-  BsFillPlayFill,
-  BsShuffle,
-} from "react-icons/bs";
-import { useRef } from "react";
-import { useSelector } from "react-redux";
+
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import Player from "./Player";
+import Controls from "./Controls";
+import Seekbar from "./Seekbar";
+import Volumebar from "./Volumebar";
+
 const MusicPlayer = () => {
-  const { activeSong, isPlaying } = useSelector((state) => state.player);
-  const audioRef = useRef();
+  const dispatch = useDispatch();
+  const { activeSong, isPlaying, currentSongList, currentIndex } = useSelector(
+    (state) => state.player
+  );
+  const [repeat, setRepeat] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+  const [seekTime, setSeekTime] = useState(0);
+  const [appTime, setAppTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.3);
+
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      dispatch(playPause(false));
+    } else {
+      dispatch(playPause(true));
+    }
+  };
+
+  let coverImage;
+  let fullName;
+  let name;
+  if (activeSong?.music) {
+    coverImage = activeSong?.music.image?.thumbnail_small.url;
+    fullName = activeSong?.music.artists[0].fullName;
+    name = activeSong?.music.album.name;
+  } else if (activeSong?.image?.thumbnail_small.url) {
+    coverImage = activeSong?.image?.thumbnail_small.url;
+    fullName = activeSong?.artists[0].fullName;
+    name = activeSong?.album.name;
+  } else if (activeSong?.song) {
+    coverImage = activeSong?.song?.image?.thumbnail_small.url;
+    fullName = activeSong?.song?.artists[0].fullName;
+    name = activeSong?.song?.album.name;
+  }
+  const handleNextSong = () => {
+    if (shuffle) {
+      dispatch(nextSong(Math.floor(Math.random() * currentSongList.length)));
+    } else {
+      console.log("next");
+      if (currentIndex !== currentSongList.length - 1) {
+        dispatch(nextSong(currentIndex + 1));
+      } else {
+        dispatch(nextSong(0));
+      }
+    }
+  };
+  const handlePrevSong = () => {
+    if (shuffle) {
+      dispatch(prevSong(Math.floor(Math.random() * currentSongList.length)));
+    } else {
+      console.log("next");
+      if (currentIndex > 0) {
+        dispatch(prevSong(currentIndex - 1));
+      } else {
+        dispatch(prevSong(currentSongList.length - 1));
+      }
+    }
+  };
+
   return (
     <div className="w-full rounded-lg duration-200 z-50 flex items-center justify-between fixed text-white bottom-0 bg-gradient-to-br from-white/5 to-secondary backdrop-blur-lg ">
-      <div className="flex items-center gap-3 p-5">
-        <img className="rounded-full w-[6rem]   " src={coverIcon} alt="cover" />
+      <div className="flex items-center gap-3 p-1 md:p-5">
+        <img
+          className="p-3  block rounded-full w-[6rem]"
+          src={coverImage}
+          alt="cover"
+        />
         <div>
-          <h3 className="font-bold text-xl">Lift Me Up From Black Panther</h3>
-          <p className="text-gray-200">hey</p>
+          <h3 className="  font-bold text-xl block">{name}</h3>
+          <p className=" text-gray-200 block">{fullName}</p>
         </div>
       </div>
-      <div className="flex   flex-col gap-2">
-        <div className="flex items-center ">
-          <BsArrowRepeat className="mx-2" size={30} />
-          <MdSkipPrevious className="mx-2" size={30} />
-          <BsFillPauseFill className="mx-2" size={50} />
-          <MdSkipNext className="mx-2" size={30} />
-          <BsShuffle className="mx-2" size={30} />
-        </div>
-        <div className="flex  ">
-          <span>0:20</span>
-          <input className="w-full mx-3" type="range" />
-          <span>0:20</span>
-        </div>
-      </div>
-      <div className="flex mr-10 ">
-        <BsFillVolumeMuteFill size={30} />
-        <input type="range" />
-      </div>
-      <audio ref={audioRef} src={audioSrc}></audio>
+      <Controls
+        isPlaying={isPlaying}
+        repeat={repeat}
+        setRepeat={setRepeat}
+        shuffle={shuffle}
+        setShuffle={setShuffle}
+        handlePlayPause={handlePlayPause}
+        handlePrevSong={handlePrevSong}
+        handleNextSong={handleNextSong}
+      />
+      <Seekbar
+        value={appTime}
+        min="0"
+        max={duration}
+        onInput={(event) => setSeekTime(event.target.value)}
+        setSeekTime={setSeekTime}
+        appTime={appTime}
+      />
+      <Volumebar
+        volume={volume}
+        onChange={(event) => setVolume(event.target.value)}
+        setVolume={setVolume}
+      />
+
+      <Player
+        activeSong={activeSong}
+        volume={volume}
+        isPlaying={isPlaying}
+        seekTime={seekTime}
+        repeat={repeat}
+        onEnded={handleNextSong}
+        onTimeUpdate={(event) => setAppTime(event.target.currentTime)}
+        onLoadedData={(event) => setDuration(event.target.duration)}
+      />
     </div>
   );
 };
