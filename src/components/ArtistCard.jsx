@@ -1,4 +1,4 @@
-const ArtistCard = ({ music, i }) => {
+const ArtistCard = ({ music }) => {
   return (
     <div className="  p-5 mt-5  md:mx-2 w-[18rem] flex flex-col items-center justify-center ">
       <img
