@@ -1,12 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+import coverIcon from "../../assets/images/cover.jpg";
+import audio from "../../assets/music/reza.mp3";
 const initialPlayerState = {
-  activeSong: {},
+  activeSong: {
+    music: {
+      album: { name: "Iran Iran (Deli)" },
+      artists: [{ fullName: "Reza Bahram" }],
+      audio: { medium: { url: audio } },
+      image: { thumbnail_small: { url: coverIcon } },
+    },
+  },
   isPlaying: false,
-  currentSong: [],
+  currentSongList: [],
   currentIndex: 0,
   isActive: false,
-  genreListId: "",
+  audioSrc: "",
 };
 
 const playerSlice = createSlice({
@@ -14,38 +22,24 @@ const playerSlice = createSlice({
   initialState: initialPlayerState,
   reducers: {
     setActiveSong: (state, action) => {
-      state.activeSong = action.payload.song;
-
-      if (action.payload?.data?.tracks?.hits) {
-        state.currentSongs = action.payload.data.tracks.hits;
-      } else if (action.payload?.data?.properties) {
-        state.currentSongs = action.payload?.data?.tracks;
-      } else {
-        state.currentSongs = action.payload.data;
-      }
-
+      state.currentSongList = action.payload.currentListData;
+      state.activeSong = action.payload.music;
       state.currentIndex = action.payload.i;
       state.isActive = true;
     },
 
     nextSong: (state, action) => {
-      if (state.currentSongs[action.payload]?.track) {
-        state.activeSong = state.currentSongs[action.payload]?.track;
-      } else {
-        state.activeSong = state.currentSongs[action.payload];
+      if (state.currentSongList[action.payload]) {
+        state.activeSong = state.currentSongList[action.payload];
       }
-
       state.currentIndex = action.payload;
       state.isActive = true;
     },
 
     prevSong: (state, action) => {
-      if (state.currentSongs[action.payload]?.track) {
-        state.activeSong = state.currentSongs[action.payload]?.track;
-      } else {
-        state.activeSong = state.currentSongs[action.payload];
+      if (state.currentSongList[action.payload]) {
+        state.activeSong = state.currentSongList[action.payload];
       }
-
       state.currentIndex = action.payload;
       state.isActive = true;
     },
@@ -53,18 +47,9 @@ const playerSlice = createSlice({
     playPause: (state, action) => {
       state.isPlaying = action.payload;
     },
-
-    selectGenreListId: (state, action) => {
-      state.genreListId = action.payload;
-    },
   },
 });
-export const {
-  setActiveSong,
-  nextSong,
-  prevSong,
-  playPause,
-  selectGenreListId,
-} = playerSlice.actions;
+export const { setActiveSong, nextSong, prevSong, playPause } =
+  playerSlice.actions;
 
 export default playerSlice.reducer;

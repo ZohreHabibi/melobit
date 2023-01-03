@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { shazamCoreApi } from "../services/shazamCoreApi";
+import { melobitApi } from "../services/melobitApi";
 import playerReducer from "../features/player";
 
 export const store = configureStore({
   reducer: {
-    [shazamCoreApi.reducerPath]: shazamCoreApi.reducer,
+    [melobitApi.reducerPath]: melobitApi.reducer,
     player: playerReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(shazamCoreApi.middleware),
+    getDefaultMiddleware().concat(melobitApi.middleware),
 });
