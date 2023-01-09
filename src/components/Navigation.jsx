@@ -31,18 +31,6 @@ const Navigation = ({ isShowMenu }) => {
 
         <div className="flex p-2">
           <NavLink
-            to="top-musics"
-            className={({ isActive }) =>
-              isActive
-                ? "text-gray-200 border-b-[.2rem] border-blue-300"
-                : "text-white"
-            }
-          >
-            TopMusics
-          </NavLink>
-        </div>
-        <div className="flex p-2">
-          <NavLink
             to="search"
             className={({ isActive }) =>
               isActive

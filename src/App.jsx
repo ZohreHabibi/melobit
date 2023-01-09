@@ -7,7 +7,6 @@ import searchIcon from "./assets/images/search-svgrepo-com.svg";
 import Search from "./pages/Search";
 import Home from "./pages/Home";
 import MusicDetail from "./pages/MusicDetail";
-import TopMusics from "./pages/TopMusics";
 import MusicPlayer from "./components/Music Player/MusicPlayer";
 
 function App() {
@@ -39,7 +38,6 @@ function App() {
           <div>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/top-musics" element={<TopMusics />} />
               <Route path="/artists/:MusicId" element={<MusicDetail />} />
               <Route path="/search/" element={<Search />} />
               <Route path="/search/:SearchTerms" element={<Search />} />

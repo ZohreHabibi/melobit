@@ -1,18 +1,39 @@
 import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
 import { useParams } from "react-router-dom";
-import { useGetMusicDetailsQuery } from "../redux/services/melobitApi";
 import { useDispatch, useSelector } from "react-redux";
 import { playPause, setActiveSong } from "../redux/features/player";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
+import { useEffect, useState } from "react";
 const MusicDetail = () => {
   const { MusicId } = useParams();
   const { isPlaying } = useSelector((state) => state.player);
   const dispatch = useDispatch();
 
-  const { data, isLoading, error } = useGetMusicDetailsQuery({
-    musicId: MusicId,
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = () => {
+      fetch(`https://api-beta.melobit.com/v1/song/${MusicId}`)
+        .then((resp) => {
+          if (!resp.ok) {
+            throw Error(`could not find url`);
+          }
+          return resp.json();
+        })
+        .then((data) => {
+          setData(data);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setIsLoading(false);
+        });
+    };
+    fetchData();
+  }, []);
 
   const getFormattedDate = (date) => {
     let year = date.getFullYear();

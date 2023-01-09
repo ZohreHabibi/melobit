@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Searchbar from "../components/Searchbar";
-import { useGetSongsAndArtistsBySearchQuery } from "../redux/services/melobitApi";
 import MusicCardSearchMusics from "../components/MusicCardSearchMusics";
 import MusicCardSearchArtists from "../components/MusicCardSearchArtists";
 import MusicCardSearchAlbums from "../components/MusicCardSearchAlbums";
@@ -9,9 +8,34 @@ import Error from "../components/Error";
 
 const Search = () => {
   const [searchResult, setSearchResult] = useState("");
-  const { data, isLoading, error } = useGetSongsAndArtistsBySearchQuery(
-    searchResult !== "" && searchResult
-  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = () => {
+      fetch(
+        `https://api-beta.melobit.com/v1/search/query/${
+          searchResult !== "" && searchResult
+        }/0/50`
+      )
+        .then((resp) => {
+          if (!resp.ok) {
+            throw Error(`could not find url`);
+          }
+          return resp.json();
+        })
+        .then((data) => {
+          setData(data?.results);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setIsLoading(false);
+        });
+    };
+    fetchData();
+  }, [searchResult]);
 
   if (isLoading) {
     return <Loader title="Search" />;
@@ -27,7 +51,7 @@ const Search = () => {
   let artistResultsArray = [];
   let albumsResultsArray = [];
 
-  data?.results.forEach((music, i) => {
+  data.forEach((music, i) => {
     if (music.type === "song") {
       musicsResultsArray.push(music);
     } else if (music.type === "artist") {
@@ -85,7 +109,6 @@ const Search = () => {
       <h1 className="text-white text-center text-3xl mt-[3.5rem]">
         Type Something To Search
       </h1>
-
       {artistsResultsContent}
       {albumsResultsContent}
       {musicsResultsContent}
