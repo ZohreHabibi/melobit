@@ -8,6 +8,7 @@ import Search from "./pages/Search";
 import Home from "./pages/Home";
 import MusicDetail from "./pages/MusicDetail";
 import MusicPlayer from "./components/Music Player/MusicPlayer";
+import TopMusics from "./pages/TopMusics";
 
 function App() {
   const [showMenu, setShowMenu] = useState(false);
@@ -39,6 +40,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/artists/:MusicId" element={<MusicDetail />} />
+              <Route path="/top-musics" element={<TopMusics />} />
               <Route path="/search/" element={<Search />} />
               <Route path="/search/:SearchTerms" element={<Search />} />
             </Routes>

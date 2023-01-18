@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
+// import audioSrc from "../../assets/01 Hollywood's Bleeding.mp3";
 const Player = ({
   volume,
   isPlaying,
   seekTime,
+  repeat,
   onTimeUpdate,
   onLoadedData,
   activeSong,
@@ -37,6 +39,7 @@ const Player = ({
       onTimeUpdate={onTimeUpdate}
       ref={audioRef}
       src={audioSrc}
+      loop={repeat}
       onEnded={onEnded}
     />
   );

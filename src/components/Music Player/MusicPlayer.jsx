@@ -12,6 +12,8 @@ const MusicPlayer = () => {
   const { activeSong, isPlaying, currentSongList, currentIndex } = useSelector(
     (state) => state.player
   );
+  const [repeat, setRepeat] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
   const [seekTime, setSeekTime] = useState(0);
   const [appTime, setAppTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -42,17 +44,27 @@ const MusicPlayer = () => {
     name = activeSong?.song?.album.name;
   }
   const handleNextSong = () => {
-    if (currentIndex !== currentSongList.length - 1) {
-      dispatch(nextSong(currentIndex + 1));
+    if (shuffle) {
+      dispatch(nextSong(Math.floor(Math.random() * currentSongList.length)));
     } else {
-      dispatch(nextSong(0));
+      console.log("next");
+      if (currentIndex !== currentSongList.length - 1) {
+        dispatch(nextSong(currentIndex + 1));
+      } else {
+        dispatch(nextSong(0));
+      }
     }
   };
   const handlePrevSong = () => {
-    if (currentIndex > 0) {
-      dispatch(prevSong(currentIndex - 1));
+    if (shuffle) {
+      dispatch(prevSong(Math.floor(Math.random() * currentSongList.length)));
     } else {
-      dispatch(prevSong(currentSongList.length - 1));
+      console.log("next");
+      if (currentIndex > 0) {
+        dispatch(prevSong(currentIndex - 1));
+      } else {
+        dispatch(prevSong(currentSongList.length - 1));
+      }
     }
   };
 
@@ -71,6 +83,10 @@ const MusicPlayer = () => {
       </div>
       <Controls
         isPlaying={isPlaying}
+        repeat={repeat}
+        setRepeat={setRepeat}
+        shuffle={shuffle}
+        setShuffle={setShuffle}
         handlePlayPause={handlePlayPause}
         handlePrevSong={handlePrevSong}
         handleNextSong={handleNextSong}
@@ -94,6 +110,7 @@ const MusicPlayer = () => {
         volume={volume}
         isPlaying={isPlaying}
         seekTime={seekTime}
+        repeat={repeat}
         onEnded={handleNextSong}
         onTimeUpdate={(event) => setAppTime(event.target.currentTime)}
         onLoadedData={(event) => setDuration(event.target.duration)}
